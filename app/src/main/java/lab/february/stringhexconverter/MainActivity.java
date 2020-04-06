@@ -1,6 +1,9 @@
 package lab.february.stringhexconverter;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText mStringInputEditText;
     private EditText mHexInputEditText;
+    private CheckBox mCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,15 +40,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public String convertedText() {
                 if (mHexInputEditText.length() != 0) {
-                    StringBuilder hexCode = new StringBuilder(mHexInputEditText.getText().toString());
-                    if (hexCode.length() % 2 == 1) {
-                        hexCode.append('0');
+                    String hexCode = mHexInputEditText.getText().toString();
+                    StringBuilder hexCodeBuilder = new StringBuilder(
+                            mCheckBox.isChecked() ? hexCode.replaceAll(" ", "") : hexCode);
+
+                    if (hexCodeBuilder.length() % 2 == 1) {
+                        hexCodeBuilder.append('0');
                     }
 
                     StringBuilder stringBuilder = new StringBuilder();
-                    for (int i = 0; i < hexCode.length(); i += 2) {
+                    for (int i = 0; i < hexCodeBuilder.length(); i += 2) {
                         try {
-                            stringBuilder.append((char) Integer.parseInt(hexCode.substring(i, i + 2), 16));
+                            stringBuilder.append((char) Integer.parseInt(
+                                    hexCodeBuilder.substring(i, i + 2), 16));
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
                             stringBuilder.append("¿");
@@ -59,5 +67,21 @@ public class MainActivity extends AppCompatActivity {
         };
         hexInputTextWatcher.setResponder(mStringInputEditText);
         mHexInputEditText.addTextChangedListener(hexInputTextWatcher);
+
+        mCheckBox = findViewById(R.id.checkBox);
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.d(TAG, "onCheckedChanged: ISCHECKED");
+                    String hexCode = mHexInputEditText.getText().toString();
+                    mHexInputEditText.setText(hexCode.replaceAll("..(?!$)", "$0 "));
+                } else {
+                    Log.d(TAG, "onCheckedChanged: ISNOTCHECKED");
+                    String hexCode = mHexInputEditText.getText().toString();
+                    mHexInputEditText.setText(hexCode.replaceAll(" ", ""));
+                }
+            }
+        });
     }
 }
