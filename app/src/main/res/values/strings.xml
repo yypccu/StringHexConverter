@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">String Hex Converter</string>
+    <string name="append_space">Append Space With Hex</string>
+</resources>
