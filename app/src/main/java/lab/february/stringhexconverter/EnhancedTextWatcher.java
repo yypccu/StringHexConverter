@@ -14,6 +14,10 @@ public abstract class EnhancedTextWatcher implements TextWatcher {
         mResponderTextView = responder;
     }
 
+    public void releaseResponder() {
+        mResponderTextView = null;
+    }
+
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         // Do Nothing

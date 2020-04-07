@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText mStringInputEditText;
     private EditText mHexInputEditText;
     private CheckBox mCheckBox;
+    private EnhancedTextWatcher mHexInputTextWatcher;
+    private EnhancedTextWatcher mStringInputTextWatcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,16 +29,16 @@ public class MainActivity extends AppCompatActivity {
         mStringInputEditText = findViewById(R.id.stringInputEditText);
         mHexInputEditText = findViewById(R.id.hexInputEditText);
 
-        EnhancedTextWatcher stringInputTextWatcher = new EnhancedTextWatcher() {
+        mStringInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
-                return String.format("%x", new BigInteger(1, mStringInputEditText.getText().toString().getBytes()));
+                String hexCode = String.format("%x", new BigInteger(1, mStringInputEditText.getText().toString().getBytes()));
+                return mCheckBox.isChecked() ? hexCode.replaceAll("..(?!$)", "$0 ") : hexCode;
             }
         };
-        stringInputTextWatcher.setResponder(mHexInputEditText);
-        mStringInputEditText.addTextChangedListener(stringInputTextWatcher);
+        mStringInputTextWatcher.setResponder(mHexInputEditText);
 
-        EnhancedTextWatcher hexInputTextWatcher = new EnhancedTextWatcher() {
+        mHexInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
                 if (mHexInputEditText.length() != 0) {
@@ -65,23 +67,36 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        hexInputTextWatcher.setResponder(mStringInputEditText);
-        mHexInputEditText.addTextChangedListener(hexInputTextWatcher);
+        mHexInputTextWatcher.setResponder(mStringInputEditText);
 
         mCheckBox = findViewById(R.id.checkBox);
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Log.d(TAG, "onCheckedChanged: ISCHECKED");
                     String hexCode = mHexInputEditText.getText().toString();
                     mHexInputEditText.setText(hexCode.replaceAll("..(?!$)", "$0 "));
                 } else {
-                    Log.d(TAG, "onCheckedChanged: ISNOTCHECKED");
                     String hexCode = mHexInputEditText.getText().toString();
                     mHexInputEditText.setText(hexCode.replaceAll(" ", ""));
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mStringInputEditText.addTextChangedListener(mStringInputTextWatcher);
+        mHexInputEditText.addTextChangedListener(mHexInputTextWatcher);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mStringInputEditText.removeTextChangedListener(mStringInputTextWatcher);
+        mHexInputEditText.removeTextChangedListener(mHexInputTextWatcher);
     }
 }
