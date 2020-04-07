@@ -1,12 +1,15 @@
 package lab.february.stringhexconverter;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.math.BigInteger;
 
@@ -17,9 +20,10 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText mStringInputEditText;
     private EditText mHexInputEditText;
-    private CheckBox mCheckBox;
     private EnhancedTextWatcher mHexInputTextWatcher;
     private EnhancedTextWatcher mStringInputTextWatcher;
+    private CheckBox mCheckBox;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         mStringInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
+                // TODO don't transform to unicode
+
                 String hexCode = String.format("%x", new BigInteger(1, mStringInputEditText.getText().toString().getBytes()));
                 return mCheckBox.isChecked() ? hexCode.replaceAll("..(?!$)", "$0 ") : hexCode;
             }
@@ -41,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         mHexInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
+                // TODO auto append space while typing hex code
+
                 if (mHexInputEditText.length() != 0) {
                     String hexCode = mHexInputEditText.getText().toString();
                     StringBuilder hexCodeBuilder = new StringBuilder(
@@ -82,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        MobileAds.initialize(this);
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
