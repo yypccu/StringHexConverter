@@ -1,6 +1,8 @@
 package lab.february.stringhexconverter;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -20,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText mStringInputEditText;
     private EditText mHexInputEditText;
-    private EnhancedTextWatcher mHexInputTextWatcher;
     private EnhancedTextWatcher mStringInputTextWatcher;
+    private EnhancedTextWatcher mHexInputTextWatcher;
     private CheckBox mCheckBox;
     private AdView mAdView;
 
@@ -32,18 +34,38 @@ public class MainActivity extends AppCompatActivity {
 
         mStringInputEditText = findViewById(R.id.stringInputEditText);
         mHexInputEditText = findViewById(R.id.hexInputEditText);
+        mCheckBox = findViewById(R.id.checkBox);
 
+        mStringInputEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d(TAG, "StringInputEditText onFocus changed: " + hasFocus);
+                mStringInputTextWatcher.setIsTyping(hasFocus);
+            }
+        });
         mStringInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
                 // TODO don't transform to unicode
 
-                String hexCode = String.format("%x", new BigInteger(1, mStringInputEditText.getText().toString().getBytes()));
-                return mCheckBox.isChecked() ? hexCode.replaceAll("..(?!$)", "$0 ") : hexCode;
+                String input = mStringInputEditText.getText().toString();
+                if (input.length() != 0) {
+                    String hexCode = String.format("%x", new BigInteger(1, input.getBytes()));
+                    return mCheckBox.isChecked() ? hexCode.replaceAll("..(?!$)", "$0 ") : hexCode;
+                } else {
+                    return "";
+                }
             }
         };
         mStringInputTextWatcher.setResponder(mHexInputEditText);
 
+        mHexInputEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d(TAG, "HexInputEditText onFocus changed: " + hasFocus);
+                mHexInputTextWatcher.setIsTyping(hasFocus);
+            }
+        });
         mHexInputTextWatcher = new EnhancedTextWatcher() {
             @Override
             public String convertedText() {
@@ -77,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         };
         mHexInputTextWatcher.setResponder(mStringInputEditText);
 
-        mCheckBox = findViewById(R.id.checkBox);
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

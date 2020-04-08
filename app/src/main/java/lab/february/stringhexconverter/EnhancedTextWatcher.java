@@ -9,13 +9,14 @@ import java.math.BigInteger;
 public abstract class EnhancedTextWatcher implements TextWatcher {
 
     private TextView mResponderTextView;
+    private boolean sourceIsTyping = false;
 
     public void setResponder(TextView responder) {
         mResponderTextView = responder;
     }
 
-    public void releaseResponder() {
-        mResponderTextView = null;
+    public void setIsTyping(boolean sourceIsTyping) {
+        this.sourceIsTyping = sourceIsTyping;
     }
 
     @Override
@@ -25,7 +26,7 @@ public abstract class EnhancedTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mResponderTextView != null && !mResponderTextView.isFocused()) {
+        if (sourceIsTyping && mResponderTextView != null && !mResponderTextView.isFocused()) {
             mResponderTextView.setText(convertedText());
         }
     }
