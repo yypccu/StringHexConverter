@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">String Hex Converter</string>
-    <string name="append_space">Append Space With Hex</string>
+    <string name="append_space">App Space</string>
     <string name="hint_of_string_input">Type some string here!</string>
     <string name="hint_of_hex_input">Or type some hex code here!</string>
 </resources>
